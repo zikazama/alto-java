@@ -1,0 +1,1 @@
+CREATE INDEX idx_transaction_date ON transactions(transaction_date);
