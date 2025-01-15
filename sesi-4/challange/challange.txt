@@ -1,0 +1,23 @@
+Latihan: Aplikasi Microservices untuk Mengirim Berbagai Jenis Notifikasi
+Deskripsi
+Kita akan membuat aplikasi microservices menggunakan Spring Boot yang menangani berbagai jenis notifikasi (email, SMS, dan push notification). Aplikasi ini akan menggunakan konsep-konsep berikut:
+
+Tugas
+Buat tiga layanan microservices: EmailService, SmsService, dan PushService.
+Buat satu layanan NotificationService yang akan mengarahkan permintaan ke layanan notifikasi yang sesuai.
+Implementasikan komunikasi antara NotificationService dan layanan notifikasi lainnya menggunakan REST API.
+Implementasikan komunikasi gRPC untuk salah satu layanan sebagai latihan tambahan.
+Gunakan Spring Cloud Netflix Eureka untuk service discovery.
+Gunakan Spring Cloud Circuit Breaker untuk mengimplementasikan circuit breaker pada NotificationService.
+Terapkan prinsip clean code dalam desain dan implementasi microservices.
+
+Output latihan berupa console di client 
+Contoh request
+curl -X POST http://localhost:8080/notifications/send \
+-H "Content-Type: application/json" \
+-d '{
+  "type": "email",
+  "recipient": "example@example.com",
+  "message": "Welcome to our platform!"
+}'
+

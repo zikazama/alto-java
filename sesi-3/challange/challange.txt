@@ -1,0 +1,14 @@
+Buatlah aplikasi Spring Boot yang menangani berbagai jenis notifikasi (email, SMS, dan push notification) menggunakan Strategy Pattern. Setiap jenis notifikasi akan memiliki logika pemrosesan yang berbeda.
+
+Buatlah aplikasi Spring Boot yang dapat mengirim berbagai jenis notifikasi. Setiap jenis notifikasi akan diimplementasikan sebagai strategi yang berbeda. Aplikasi harus dapat menerima permintaan untuk mengirim notifikasi melalui endpoint REST dan memilih strategi yang sesuai berdasarkan tipe notifikasi.
+
+Note: notifikasi tidak harus diimplement hanya sebatas di console saja, karena kita fokus kepada design pattern nya. Berikut contoh outputnya.
+
+Request:
+Endpoint: POST /send-notification
+{
+  "type": "EMAIL",
+  "recipient": "john.doe@example.com",
+  "message": "Hello John, your order has been shipped!"
+}
+

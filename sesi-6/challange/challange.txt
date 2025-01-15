@@ -1,0 +1,14 @@
+Sebuah bank digital memiliki sistem yang memungkinkan pengguna untuk memeriksa saldo mereka secara real-time melalui aplikasi seluler. Dengan peningkatan jumlah pengguna aktif harian, bank tersebut menghadapi tantangan berupa lonjakan permintaan yang menyebabkan beban besar pada database utama. Solusi yang diminta adalah dengan menggunakan Redis sebagai caching layer untuk meningkatkan performa dan mengurangi akses langsung ke database.
+Implementasikan sistem pengecekan saldo pengguna dengan menggunakan Spring Boot, MySQL sebagai database utama, dan Redis sebagai caching layer. Gunakan pendekatan clean code dalam implementasi Anda.
+
+Gunakan anotasi @Cacheable dan @CacheEvict untuk memanipulasi data cache.
+Pastikan bahwa koneksi ke Redis dan MySQL berfungsi dengan baik.
+Jelaskan langkah-langkah konfigurasi dan implementasi Anda.
+
+Kode Program:
+Proyek Spring Boot lengkap dengan implementasi Redis dan MySQL.
+Dokumentasi:
+Penjelasan setiap langkah implementasi.
+Hasil Pengujian:
+Hasil tangkapan layar dari Postman yang menunjukkan data diambil dari cache Redis dan pembaruan data ke database.
+

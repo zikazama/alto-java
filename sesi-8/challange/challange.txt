@@ -1,0 +1,7 @@
+Sebuah perusahaan keuangan industri sedang membangun sistem untuk memproses transaksi secara asinkron menggunakan RabbitMQ untuk mengelola antrian pesan. Anda diminta untuk membuat implementasi RabbitMQ dalam aplikasi berbasis Spring Boot Maven dengan Java 21.
+Catatan:
+Gunakan Java 21 dengan versi terbaru dari Spring Boot dan Maven.
+Pastikan kode yang Anda tulis mudah dipahami, dapat dipelihara, dan bebas dari duplikasi.
+Gunakan DTOs untuk representasi data dan pastikan untuk menghindari logika yang berat dalam controller.
+Output berupa endpoint yang bisa di test menggunakan cURL
+

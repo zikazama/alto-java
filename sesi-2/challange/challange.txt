@@ -1,0 +1,11 @@
+Soal: Refactoring dan Prinsip Clean Code
+Deskripsi: Berikut adalah sebuah kode Java untuk menghitung total pembayaran setelah pajak dan diskon. Kode ini mengandung beberapa masalah terkait prinsip clean code dan DRY. Tugas Anda adalah melakukan refactoring kode ini untuk meningkatkan keterbacaan, menghindari duplikasi, dan menerapkan prinsip DRY dan KISS.
+Code 
+https://github.com/zikazama/alto-java/blob/main/sesi-2/exercise.java 
+
+Tugas:
+Refactor kode di atas untuk menghindari duplikasi dan membuatnya lebih sederhana.
+Terapkan prinsip DRY (Don’t Repeat Yourself) dan KISS (Keep It Simple, Stupid).
+Perbaiki nama metode dan variabel agar lebih deskriptif.
+
+

@@ -1,0 +1,7 @@
+Anda diminta untuk membuat sistem pencatatan order untuk sebuah platform e-commerce. Sistem ini menggunakan Apache Kafka untuk menerima data order secara real-time dan menyimpannya ke dalam database MySQL menggunakan Spring Boot dengan struktur clean code.
+Sistem ini harus mendukung skenario berikut:
+Data order dikirim melalui API REST.
+Kafka Producer mengirim data order ke Kafka topic bernama orders.
+Kafka Consumer membaca data dari topic orders dan menyimpannya ke database MySQL.
+Output berupa sebuah endpoint yang bisa diakses oleh cURL
+
