@@ -1,0 +1,12 @@
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/FinanceApplication.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/config/RedisConfig.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/controller/AccountController.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/controller/LoanApplicationController.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/kafka/LoanApplicationConsumer.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/kafka/LoanApplicationProducer.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/model/AccountBalance.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/notification/NotificationListener.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/notification/NotificationPublisher.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/repository/AccountRepository.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/service/AccountService.java
+/Users/memberid/Documents/Alto/alto-java/sesi-7/case/src/main/java/com/example/demo/service/LoanApplicationService.java
