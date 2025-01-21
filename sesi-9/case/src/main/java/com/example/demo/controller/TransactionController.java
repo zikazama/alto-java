@@ -1,7 +1,7 @@
 package com.example.demo.controller;
 
 import com.example.demo.service.TransactionService;
-import com.example.demo.kafka.TransactionProducer;
+import com.example.demo.rabbitmq.TransactionProducer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,9 +1,9 @@
 com/example/demo/notification/NotificationPublisher.class
 AccountBalance.class
 com/example/demo/notification/NotificationListener.class
-com/example/demo/kafka/TransactionConsumer.class
 com/example/demo/service/CreditService.class
 com/example/demo/service/DebitService.class
+com/example/demo/rabbitmq/TransactionConsumer.class
 com/example/demo/config/KafkaConfig.class
 com/example/demo/controller/LoanApplicationController.class
 AccountService.class
@@ -14,7 +14,7 @@ com/example/demo/controller/TransactionController.class
 com/example/demo/controller/TransactionSagaController.class
 com/example/demo/service/LoanApplicationService.class
 com/example/demo/config/RabbitMQConfig.class
-com/example/demo/kafka/TransactionProducer.class
+com/example/demo/rabbitmq/TransactionProducer.class
 com/example/demo/kafka/LoanApplicationConsumer.class
 com/example/demo/saga/SagaOrchestrator.class
 com/example/demo/FinanceApplication.class

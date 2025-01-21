@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.kafka.TransactionProducer;
+import com.example.demo.rabbitmq.TransactionProducer;
 import org.springframework.stereotype.Service;
 
 @Service

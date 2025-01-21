@@ -1,4 +1,4 @@
-package com.example.demo.kafka;
+package com.example.demo.rabbitmq;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
