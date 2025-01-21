@@ -1,0 +1,39 @@
+Anda diminta untuk mengembangkan sebuah sistem transaksi keuangan sederhana menggunakan Spring Boot. Sistem ini harus mengimplementasikan Saga Pattern untuk menjaga konsistensi data pada transaksi terdistribusi.
+Deskripsi Soal:
+Sistem ini melibatkan dua langkah:
+Debit Service: Memotong saldo dari akun pengirim.
+Credit Service: Menambahkan saldo ke akun penerima.
+Jika proses Credit Service gagal, maka saldo di Debit Service harus dikembalikan menggunakan langkah rollback.
+
+Buatlah endpoint REST API untuk memulai transaksi menggunakan URL berikut:
+POST /api/transaction/process
+Parameter yang diterima:
+accountIdFrom: ID akun pengirim.
+accountIdTo: ID akun penerima.
+amount: Jumlah uang yang ditransfer.
+Gunakan Service Layer untuk logika bisnis dan tambahkan validasi dasar untuk parameter input.
+Tambahkan mekanisme rollback pada kegagalan di langkah Credit Service.
+
+Struktur proyek minimal:
+Controller untuk mengelola HTTP request.
+Service untuk logika bisnis transaksi (Debit dan Credit).
+Orchestrator untuk mengatur alur proses transaksi.
+Gunakan Spring Boot untuk pengembangan aplikasi.
+Tambahkan simulasi kegagalan dalam Credit Service untuk menguji rollback.
+
+Jika transaksi berhasil:
+Respons:
+{
+  "status": "success",
+  "message": "Transaction completed successfully."
+}
+
+
+Jika transaksi gagal:
+Respons:
+{
+  "status": "failed",
+  "message": "Transaction failed. Rolled back successfully."
+}
+
+

@@ -1,6 +1,6 @@
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/FinanceApplication.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/FinanceApplication.java ===
 package com.example.demo;
 
 import org.springframework.boot.SpringApplication;
@@ -17,10 +17,29 @@ public class FinanceApplication {
 
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/FinanceApplication.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/FinanceApplication.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/config/RabbitMQConfig.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/config/KafkaConfig.java ===
+package com.example.demo.config;
+
+import org.apache.kafka.clients.admin.NewTopic;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class KafkaConfig {
+
+    @Bean
+    public NewTopic transactionTopic() {
+        return new NewTopic("transaction-events", 1, (short) 1);
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/config/KafkaConfig.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/config/RabbitMQConfig.java ===
 package com.example.demo.config;
 
 import org.springframework.amqp.core.*;
@@ -50,10 +69,10 @@ public class RabbitMQConfig {
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/config/RabbitMQConfig.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/config/RabbitMQConfig.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/controller/AccountController.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/AccountController.java ===
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -76,10 +95,10 @@ public class AccountController {
         return ResponseEntity.ok("Account balance updated successfully");
     }
 }
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/controller/AccountController.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/AccountController.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/controller/LoanApplicationController.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/LoanApplicationController.java ===
 package com.example.demo.controller;
 
 import com.example.demo.service.LoanApplicationService;
@@ -100,13 +119,14 @@ public class LoanApplicationController {
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/controller/LoanApplicationController.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/LoanApplicationController.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/controller/TransactionController.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/TransactionController.java ===
 package com.example.demo.controller;
 
 import com.example.demo.service.TransactionService;
+import com.example.demo.rabbitmq.TransactionProducer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -115,22 +135,57 @@ import org.springframework.web.bind.annotation.*;
 public class TransactionController {
 
     private final TransactionService transactionService;
+    private final TransactionProducer transactionProducer;
 
-    public TransactionController(TransactionService transactionService) {
+    // Constructor Injection (Semua dependency diinisialisasi)
+    public TransactionController(TransactionService transactionService, TransactionProducer transactionProducer) {
         this.transactionService = transactionService;
+        this.transactionProducer = transactionProducer;
     }
 
-    @PostMapping
+    @PostMapping("/send")
+    public String sendTransaction(@RequestBody String transaction) {
+        transactionProducer.sendTransaction(transaction); // Kirim data transaksi ke Kafka
+        return "Transaction sent to Kafka!";
+    }
+
+    @PostMapping("/process")
     public ResponseEntity<String> createTransaction(@RequestBody String transactionData) {
-        transactionService.processAndSendTransaction(transactionData);
+        transactionService.processAndSendTransaction(transactionData); // Proses transaksi
         return ResponseEntity.ok("Transaction sent successfully");
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/controller/TransactionController.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/TransactionController.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/LoanApplicationConsumer.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/TransactionSagaController.java ===
+package com.example.demo.controller;
+
+import com.example.demo.saga.SagaOrchestrator;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/transactions-saga")
+public class TransactionSagaController {
+
+    private final SagaOrchestrator sagaOrchestrator;
+
+    public TransactionSagaController(SagaOrchestrator sagaOrchestrator) {
+        this.sagaOrchestrator = sagaOrchestrator;
+    }
+
+    @PostMapping("/transfer")
+    public String transfer(@RequestParam String accountIdA, @RequestParam String accountIdB, @RequestParam double amount) {
+        sagaOrchestrator.executeSaga(accountIdA, accountIdB, amount);
+        return "Transaction completed.";
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/controller/TransactionSagaController.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/kafka/LoanApplicationConsumer.java ===
 package com.example.demo.kafka;
 
 import org.springframework.kafka.annotation.KafkaListener;
@@ -146,10 +201,10 @@ public class LoanApplicationConsumer {
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/LoanApplicationConsumer.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/kafka/LoanApplicationConsumer.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/LoanApplicationProducer.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/kafka/LoanApplicationProducer.java ===
 package com.example.demo.kafka;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -171,65 +226,10 @@ public class LoanApplicationProducer {
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/LoanApplicationProducer.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/kafka/LoanApplicationProducer.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/TransactionConsumer.java ===
-package com.example.demo.kafka;
-
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Service;
-
-@Service
-public class TransactionConsumer {
-
-    @RabbitListener(queues = "transactionQueue")
-    public void receiveTransaction(String transactionMessage) {
-        System.out.println("Transaction message received: " + transactionMessage);
-        processTransaction(transactionMessage);
-    }
-
-    private void processTransaction(String transactionMessage) {
-        // Logika pemrosesan transaksi
-        System.out.println("Processing transaction: " + transactionMessage);
-    }
-}
-
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/TransactionConsumer.java ===
-
-
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/TransactionProducer.java ===
-package com.example.demo.kafka;
-
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-@Service
-public class TransactionProducer {
-
-    private final RabbitTemplate rabbitTemplate;
-    private final String exchange;
-    private final String routingKey;
-
-    public TransactionProducer(RabbitTemplate rabbitTemplate, 
-                               @Value("${transaction.exchange}") String exchange,
-                               @Value("${transaction.routingKey}") String routingKey) {
-        this.rabbitTemplate = rabbitTemplate;
-        this.exchange = exchange;
-        this.routingKey = routingKey;
-    }
-
-    public void sendTransaction(String transactionMessage) {
-        rabbitTemplate.convertAndSend(exchange, routingKey, transactionMessage);
-        System.out.println("Transaction message sent: " + transactionMessage);
-    }
-}
-
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/kafka/TransactionProducer.java ===
-
-
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/model/AccountBalance.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/model/AccountBalance.java ===
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
@@ -262,10 +262,10 @@ public class AccountBalance {
     }
     
 }
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/model/AccountBalance.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/model/AccountBalance.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/notification/NotificationListener.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/notification/NotificationListener.java ===
 package com.example.demo.notification;
 
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -280,10 +280,10 @@ public class NotificationListener {
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/notification/NotificationListener.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/notification/NotificationListener.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/notification/NotificationPublisher.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/notification/NotificationPublisher.java ===
 package com.example.demo.notification;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -303,20 +303,132 @@ public class NotificationPublisher {
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/notification/NotificationPublisher.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/notification/NotificationPublisher.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/repository/AccountRepository.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/rabbitmq/TransactionConsumer.java ===
+package com.example.demo.rabbitmq;
+
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.stereotype.Service;
+
+import com.example.demo.service.TransactionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.stereotype.Service;
+
+
+@Service
+public class TransactionConsumer {
+
+    @RabbitListener(queues = "transactionQueue")
+    public void receiveTransaction(String transactionMessage) {
+        System.out.println("Transaction message received: " + transactionMessage);
+        processTransaction(transactionMessage);
+    }
+
+    private void processTransaction(String transactionMessage) {
+        // Logika pemrosesan transaksi
+        System.out.println("Processing transaction: " + transactionMessage);
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/rabbitmq/TransactionConsumer.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/rabbitmq/TransactionProducer.java ===
+package com.example.demo.rabbitmq;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.stereotype.Service;
+
+@Service
+public class TransactionProducer {
+
+    private final RabbitTemplate rabbitTemplate;
+    private final String exchange;
+    private final String routingKey;
+    private final KafkaTemplate<String, String> kafkaTemplate;
+
+    // Constructor Injection
+    public TransactionProducer(
+        RabbitTemplate rabbitTemplate,
+        KafkaTemplate<String, String> kafkaTemplate,
+        @Value("${transaction.exchange}") String exchange,
+        @Value("${transaction.routingKey}") String routingKey) {
+
+        this.rabbitTemplate = rabbitTemplate;
+        this.kafkaTemplate = kafkaTemplate;
+        this.exchange = exchange;
+        this.routingKey = routingKey;
+    }
+
+    // Method to send message to RabbitMQ
+    public void sendTransaction(String transactionMessage) {
+        rabbitTemplate.convertAndSend(exchange, routingKey, transactionMessage);
+        System.out.println("Transaction message sent to RabbitMQ: " + transactionMessage);
+    }
+
+    // Method to send message to Kafka
+    public void sendTransactionKafka(String transaction) {
+        kafkaTemplate.send("transaction-events", transaction);
+        System.out.println("Transaction message sent to Kafka: " + transaction);
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/rabbitmq/TransactionProducer.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/repository/AccountRepository.java ===
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AccountRepository extends JpaRepository<AccountBalance, String> {
 }
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/repository/AccountRepository.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/repository/AccountRepository.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/service/AccountService.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/saga/SagaOrchestrator.java ===
+package com.example.demo.saga;
+
+import com.example.demo.service.CreditService;
+import com.example.demo.service.DebitService;
+import org.springframework.stereotype.Service;
+
+@Service
+public class SagaOrchestrator {
+
+    private final DebitService debitService;
+    private final CreditService creditService;
+
+    public SagaOrchestrator(DebitService debitService, CreditService creditService) {
+        this.debitService = debitService;
+        this.creditService = creditService;
+    }
+
+    public void executeSaga(String accountIdA, String accountIdB, double amount) {
+        try {
+            // Step 1: Debit account A
+            debitService.debit(accountIdA, amount);
+
+            // Step 2: Credit account B
+            creditService.credit(accountIdB, amount);
+
+            System.out.println("Transaction completed successfully.");
+        } catch (Exception e) {
+            System.out.println("Transaction failed. Initiating rollback...");
+            debitService.rollbackDebit(accountIdA, amount);
+        }
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/saga/SagaOrchestrator.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/AccountService.java ===
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -342,10 +454,52 @@ public class AccountService {
         accountRepository.save(account);
     }
 }
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/service/AccountService.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/AccountService.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/service/LoanApplicationService.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/CreditService.java ===
+package com.example.demo.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class CreditService {
+
+    public void credit(String accountId, double amount) {
+        System.out.println("Crediting " + amount + " to account: " + accountId);
+        // Logic to credit the account
+        if (amount > 1000) {
+            throw new RuntimeException("Simulated failure in Credit Service");
+        }
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/CreditService.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/DebitService.java ===
+package com.example.demo.service;
+
+import org.springframework.stereotype.Service;
+
+@Service
+public class DebitService {
+
+    public void debit(String accountId, double amount) {
+        System.out.println("Debiting " + amount + " from account: " + accountId);
+        // Logic to debit the account
+    }
+
+    public void rollbackDebit(String accountId, double amount) {
+        System.out.println("Rolling back debit of " + amount + " for account: " + accountId);
+        // Logic to reverse debit
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/DebitService.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/LoanApplicationService.java ===
 package com.example.demo.service;
 
 import com.example.demo.kafka.LoanApplicationProducer;
@@ -364,13 +518,13 @@ public class LoanApplicationService {
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/service/LoanApplicationService.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/LoanApplicationService.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/service/TransactionService.java ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/TransactionService.java ===
 package com.example.demo.service;
 
-import com.example.demo.kafka.TransactionProducer;
+import com.example.demo.rabbitmq.TransactionProducer;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -386,12 +540,17 @@ public class TransactionService {
         // Logika tambahan sebelum pengiriman (misalnya validasi)
         transactionProducer.sendTransaction(transactionData);
     }
+
+    public void saveTransaction(String transaction) {
+        // Simpan transaksi ke database (implementasi repositori)
+        System.out.println("Saving transaction: " + transaction);
+    }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/java/com/example/demo/service/TransactionService.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/java/com/example/demo/service/TransactionService.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/resources/application.properties ===
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/resources/application.properties ===
 spring.application.name=finance
 spring.redis.host=localhost
 spring.redis.port=6379
@@ -408,4 +567,12 @@ transaction.routingKey=transactionRoutingKey
 logging.level.org.springframework.amqp=INFO
 logging.level.com.example.demo=DEBUG
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-8/case/src/main/resources/application.properties ===
+spring.kafka.bootstrap-servers=localhost:9093
+spring.kafka.consumer.group-id=transaction-group
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-10/case/src/main/resources/application.properties ===
