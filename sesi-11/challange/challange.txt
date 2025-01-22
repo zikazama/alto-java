@@ -1,0 +1,36 @@
+Buatlah sebuah aplikasi E-Wallet Management System menggunakan Spring Boot, Maven, dan Java 21. Aplikasi ini harus memiliki kemampuan untuk:
+Mendaftarkan pengguna baru dan menghasilkan token JWT untuk otentikasi.
+Melakukan top-up saldo dan memeriksa saldo pengguna.
+Melakukan transfer antar pengguna, termasuk validasi saldo.
+Menggunakan JWT (JSON Web Token) untuk melindungi semua endpoint kecuali endpoint login dan registrasi.
+
+Buat paket-paket berikut:
+controller: Untuk mengatur endpoint API.
+service: Untuk logika bisnis.
+repository: Untuk akses ke database (gunakan JPA).
+model: Untuk entitas data.
+security: Untuk otentikasi dan otorisasi JWT.
+Gunakan database MySQL untuk menyimpan data pengguna dan transaksi.
+
+POST /api/auth/register
+Menerima data pengguna (username, password) dan menyimpan pengguna ke database. Hash password sebelum disimpan.
+
+POST /api/auth/login
+Validasi kredensial pengguna dan kembalikan token JWT jika valid.
+
+POST /api/wallet/topup
+Tambahkan saldo ke akun pengguna berdasarkan jumlah yang diberikan (butuh otentikasi).
+
+POST /api/wallet/transfer
+Transfer saldo dari akun pengguna ke akun pengguna lain (butuh otentikasi).
+
+GET /api/wallet/balance
+Ambil saldo akun pengguna saat ini (butuh otentikasi).
+
+Contoh
+
+curl -X POST http://localhost:8080/api/auth/login \
+-H "Content-Type: application/json" \
+-d '{"username": "user1", "password": "password"}'
+
+
