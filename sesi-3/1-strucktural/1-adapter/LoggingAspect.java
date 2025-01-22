@@ -1,3 +1,5 @@
+import java.io.IOException;
+
 // Legacy Payment System Interface
 interface LegacyPayment {
     void processPayment(double amount);
