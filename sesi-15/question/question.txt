@@ -1,0 +1,40 @@
+Sebuah perusahaan fintech sedang mengembangkan platform aplikasi untuk pengelolaan transaksi finansial. Sistem ini dirancang untuk mengelola data transaksi pelanggan secara real-time dan harus mendukung skalabilitas yang tinggi serta ketahanan terhadap kegagalan sistem. Perusahaan ini membutuhkan implementasi caching untuk meningkatkan performa, message broker untuk komunikasi antar layanan yang efisien, dan arsitektur microservices untuk mendukung pengolahan transaksi yang terdistribusi.
+
+Tantangan yang dihadapi adalah memastikan bahwa data transaksi pelanggan dapat diproses dengan cepat, sementara beban server yang tinggi tidak menyebabkan keterlambatan atau kegagalan sistem. Penggunaan sistem caching, message broker, dan pola arsitektur microservices yang tepat sangat diperlukan untuk mencapai hal tersebut. Selain itu, sistem harus dibangun dengan menggunakan Spring Boot, Maven, dan Java 21.
+
+Implementasi Caching dengan Redis:
+Gunakan Redis sebagai cache untuk menyimpan informasi transaksi yang sering diakses, misalnya detail transaksi atau saldo akun pelanggan.
+Gunakan TTL (Time-to-Live) pada cache transaksi yang sudah lama tidak digunakan.
+Integrasikan Redis dengan Spring Boot menggunakan dependency di Maven dan konfigurasi yang tepat.
+
+Penggunaan Message Broker dengan RabbitMQ atau Kafka:
+Implementasikan RabbitMQ atau Kafka sebagai message broker untuk komunikasi antar microservices dalam sistem.
+Buatlah dua jenis message: satu untuk pengolahan transaksi yang perlu diproses segera dan satu lagi untuk transaksi yang membutuhkan verifikasi manual.
+Implementasikan pola routing di RabbitMQ atau pengaturan topics di Kafka untuk memastikan pesan diproses dengan benar oleh layanan yang sesuai.
+
+Pengelolaan Transaksi dengan CQRS dan Saga Pattern:
+Terapkan CQRS (Command Query Responsibility Segregation) untuk memisahkan operasi baca dan tulis pada database transaksi.
+Gunakan Event Sourcing untuk menyimpan setiap perubahan status transaksi sebagai event yang dapat digunakan untuk audit dan pemulihan data.
+Implementasikan Saga Pattern untuk mengelola transaksi terdistribusi antar microservices yang berhubungan dengan pengolahan transaksi finansial.
+
+Clean Code dan Struktur Spring Boot:
+Pastikan kode yang ditulis mudah dipahami, terstruktur dengan baik, dan mematuhi prinsip clean code.
+Gunakan fitur-fitur Java 21 terbaru untuk meningkatkan kualitas dan efisiensi kode.
+Terapkan dependency injection dan pattern desain yang tepat dalam arsitektur Spring Boot.
+
+Studi Kasus:
+Berdasarkan simulasi transaksi finansial yang menggunakan data dummy, tunjukkan bagaimana caching dengan Redis, message broker, dan pola CQRS serta Saga Pattern bekerja dalam sistem untuk meningkatkan efisiensi dan ketahanan sistem.
+Jelaskan bagaimana penerapan teknologi ini dapat membantu perusahaan dalam mengatasi masalah skalabilitas, performa, dan kegagalan sistem di dunia nyata.
+
+Spring Boot dengan versi terbaru (Java 21).
+Maven untuk manajemen dependensi.
+Redis untuk caching.
+RabbitMQ atau Kafka untuk message broker.
+CQRS dan Saga Pattern untuk arsitektur transaksi.
+Docker (opsional) untuk menjalankan Redis dan RabbitMQ/Kafka dalam container.
+
+Sertakan file README dengan instruksi cara menjalankan aplikasi.
+Diagram Arsitektur Aplikasi (misalnya menggunakan UML).
+Instruksi Penggunaan API (termasuk contoh request dan response JSON).
+Kode Sumber (termasuk file pom.xml, file konfigurasi database, dan implementasi Java).
+

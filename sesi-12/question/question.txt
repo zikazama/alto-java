@@ -1,0 +1,54 @@
+Lingkup Aplikasi: Aplikasi manajemen transaksi finansial (contoh: dompet digital, aplikasi manajemen investasi, atau sistem pembayaran).
+
+Tech Stack: Spring Boot Maven dengan Java versi 21
+
+Modularitas: Aplikasi harus terdiri dari beberapa layanan (microservices) independen, seperti:
+Service Pengguna: Untuk registrasi, otentikasi, dan pengelolaan profil pengguna.
+Service Transaksi: Untuk mencatat transaksi, menghitung saldo, dan histori transaksi.
+Service Notifikasi: Untuk mengirim notifikasi transaksi menggunakan email/SMS.
+
+Komunikasi Antar Layanan:
+Gunakan REST API atau gRPC untuk pertukaran data antar microservices.
+Pastikan implementasi circuit breaker untuk menangani kegagalan layanan.
+
+Spring Boot:
+Digunakan untuk pengembangan microservices.
+Implementasikan best practices seperti dependency injection dan repository pattern.
+
+Redis:
+Gunakan Redis sebagai caching layer untuk meningkatkan performa akses data, misalnya menyimpan token otentikasi atau data pengguna sementara.
+
+RabbitMQ/Kafka:
+RabbitMQ: Implementasi queueing untuk komunikasi asynchronous, seperti pengelolaan notifikasi.
+Kafka: Digunakan untuk streaming data real-time, seperti analisis transaksi pengguna.
+
+MySQL/PostgreSQL:
+MySQL atau PostgreSQL digunakan sebagai database utama.
+Implementasikan indexing, normalization, dan optimasi query untuk performa yang lebih baik.
+
+Clean Code:
+Gunakan penamaan variabel, metode, dan kelas yang deskriptif.
+Strukturkan kode berdasarkan prinsip DRY, KISS, dan SOLID.
+Sertakan dokumentasi kode sesuai standar industri.
+
+Modularitas:
+Pisahkan logika bisnis, pengelolaan data, dan antarmuka komunikasi untuk memastikan keterpisahan tanggung jawab.
+
+Studi Kasus: Sistem Manajemen Dompet Digital
+
+Fitur Utama:
+Pengguna dapat melakukan top-up, pembayaran, dan transfer antar pengguna.
+Histori transaksi dengan pencarian berdasarkan rentang tanggal.
+Notifikasi untuk transaksi sukses/gagal.
+Analitik dasar, seperti ringkasan pengeluaran bulanan.
+
+Arsitektur Microservices:
+User Service: CRUD pengguna, otentikasi (JWT/OAuth2).
+Transaction Service: Mengelola transaksi dengan validasi otomatis.
+Notification Service: Pengiriman email/SMS melalui RabbitMQ.
+Analytics Service: Menganalisis data transaksi pengguna menggunakan Kafka.
+
+Dokumen Desain: Diagram arsitektur, ERD, dan deskripsi teknis layanan.
+Kode Sumber: Repositori GitHub dengan struktur modular, dokumentasi, dan clean code.
+Dokumentasi API: Endpoint REST API/gRPC beserta contoh penggunaan.
+Demo Aplikasi: Aplikasi yang dapat diakses melalui Postman/UI sederhana untuk memvalidasi fungsionalitas.

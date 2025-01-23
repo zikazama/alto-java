@@ -1,0 +1,55 @@
+Sebuah perusahaan fintech ingin mengembangkan backend service untuk sistem manajemen transaksi. Sistem ini akan menangani kebutuhan berikut:
+
+Pembuatan Akun Pengguna
+Pengguna dapat membuat akun dengan informasi berikut:
+Nama lengkap
+Email (unik)
+Saldo awal (opsional, default = 0)
+
+Manajemen Transaksi
+Sistem harus memungkinkan:
+Deposit: Pengguna dapat menambahkan saldo ke akun mereka.
+Withdraw: Pengguna dapat menarik saldo dari akun mereka (saldo tidak boleh kurang dari 0).
+Transfer: Pengguna dapat mentransfer saldo ke pengguna lain.
+
+Laporan Transaksi
+Pengguna dapat melihat riwayat transaksi mereka, termasuk deposit, withdraw, dan transfer, yang disusun dalam urutan waktu.
+
+Validasi dan Keamanan
+Semua operasi harus memenuhi aturan validasi berikut:
+Email harus unik dan valid.
+Jumlah transaksi harus berupa angka positif.
+Operasi transfer hanya diizinkan jika saldo cukup.
+
+Modularitas dan Clean Code
+Sistem harus dirancang dengan pendekatan modular menggunakan prinsip Clean Architecture. Pastikan semua layanan logika bisnis dipisahkan dari lapisan kontrol dan lapisan data.
+
+Buat aplikasi Spring Boot berbasis Maven menggunakan Java 21 dengan persyaratan berikut:
+
+Proyek Maven:
+Gunakan dependency untuk Spring Boot (versi terbaru yang mendukung Java 21), JPA, dan H2 Database.
+
+Struktur Folder:
+Implementasikan struktur berbasis Clean Architecture:
+domain: Berisi entitas utama seperti User dan Transaction.
+usecase: Berisi logika bisnis untuk manajemen transaksi.
+adapter/controller: Berisi endpoint REST API untuk setiap fitur.
+adapter/repository: Berisi interaksi dengan database.
+
+Fitur REST API:
+Implementasikan endpoint REST berikut:
+POST /users: Untuk membuat akun pengguna.
+POST /transactions/deposit: Untuk menambahkan saldo.
+POST /transactions/withdraw: Untuk menarik saldo.
+POST /transactions/transfer: Untuk mentransfer saldo ke akun lain.
+GET /transactions/{userId}: Untuk mendapatkan riwayat transaksi pengguna.
+
+Validasi dan Pengujian:
+Gunakan Spring Validation untuk memvalidasi input.
+Buat pengujian unit (unit tests) untuk memastikan setiap fitur berjalan dengan benar.
+
+Database:
+Gunakan H2 sebagai in-memory database.
+Buat tabel untuk users dan transactions menggunakan JPA.
+
+Sertakan file README dengan instruksi cara menjalankan aplikasi.
