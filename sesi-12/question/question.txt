@@ -1,52 +1,78 @@
-Lingkup Aplikasi: Aplikasi manajemen transaksi finansial (contoh: dompet digital, aplikasi manajemen investasi, atau sistem pembayaran).
+Lingkup Proyek
 
-Tech Stack: Spring Boot Maven dengan Java versi 21
+Aplikasi: Sistem Manajemen Dompet Digital.
 
-Modularitas: Aplikasi harus terdiri dari beberapa layanan (microservices) independen, seperti:
-Service Pengguna: Untuk registrasi, otentikasi, dan pengelolaan profil pengguna.
-Service Transaksi: Untuk mencatat transaksi, menghitung saldo, dan histori transaksi.
-Service Notifikasi: Untuk mengirim notifikasi transaksi menggunakan email/SMS.
+Tech Stack:
+Spring Boot (Maven, Java 21).
+Redis sebagai caching layer.
+RabbitMQ atau Kafka untuk message broker.
+MySQL/PostgreSQL sebagai database utama.
 
-Komunikasi Antar Layanan:
-Gunakan REST API atau gRPC untuk pertukaran data antar microservices.
-Pastikan implementasi circuit breaker untuk menangani kegagalan layanan.
+Registrasi, Otentikasi, dan Pengelolaan Profil Pengguna
+Sistem registrasi pengguna dengan validasi input.
+Otentikasi menggunakan JWT (JSON Web Token) untuk keamanan API.
 
-Spring Boot:
-Digunakan untuk pengembangan microservices.
-Implementasikan best practices seperti dependency injection dan repository pattern.
+Manajemen Transaksi
+Fitur untuk top-up, transfer antar pengguna, dan pembayaran.
+Riwayat transaksi berdasarkan rentang tanggal.
 
-Redis:
-Gunakan Redis sebagai caching layer untuk meningkatkan performa akses data, misalnya menyimpan token otentikasi atau data pengguna sementara.
+Notifikasi Transaksi
+Notifikasi email/SMS untuk transaksi sukses/gagal menggunakan RabbitMQ sebagai message broker.
 
-RabbitMQ/Kafka:
-RabbitMQ: Implementasi queueing untuk komunikasi asynchronous, seperti pengelolaan notifikasi.
-Kafka: Digunakan untuk streaming data real-time, seperti analisis transaksi pengguna.
+Analitik Dasar
+Analisis pengeluaran bulanan pengguna menggunakan Kafka sebagai data streaming platform.
 
-MySQL/PostgreSQL:
-MySQL atau PostgreSQL digunakan sebagai database utama.
-Implementasikan indexing, normalization, dan optimasi query untuk performa yang lebih baik.
+Rate Limiting
+Implementasi rate limiting menggunakan Spring Boot untuk mencegah DDoS atau overuse API.
 
-Clean Code:
-Gunakan penamaan variabel, metode, dan kelas yang deskriptif.
-Strukturkan kode berdasarkan prinsip DRY, KISS, dan SOLID.
-Sertakan dokumentasi kode sesuai standar industri.
+Logging dan Monitoring
+Setup logging (gunakan Logback atau SLF4J) untuk pencatatan aktivitas sistem.
 
-Modularitas:
-Pisahkan logika bisnis, pengelolaan data, dan antarmuka komunikasi untuk memastikan keterpisahan tanggung jawab.
+Input Validation
+Validasi input menggunakan Spring Validation untuk mencegah serangan berbasis input, seperti SQL Injection atau XSS.
 
-Studi Kasus: Sistem Manajemen Dompet Digital
+CREATE TABLE transactions (
+  transaction_id UUID PRIMARY KEY,
+  user_id UUID NOT NULL,
+  type ENUM('TOPUP', 'TRANSFER', 'PAYMENT'),
+  amount DECIMAL(10, 2),
+  status ENUM('SUCCESS', 'FAILED'),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-Fitur Utama:
-Pengguna dapat melakukan top-up, pembayaran, dan transfer antar pengguna.
-Histori transaksi dengan pencarian berdasarkan rentang tanggal.
-Notifikasi untuk transaksi sukses/gagal.
-Analitik dasar, seperti ringkasan pengeluaran bulanan.
+Konfigurasi Redis untuk Otentikasi Token
+Simpan token otentikasi (access/refresh token) di Redis dengan masa berlaku tertentu.
+Contoh implementasi:
+redisTemplate.opsForValue().set("TOKEN_KEY", jwtToken, 3600, TimeUnit.SECONDS);
 
-Arsitektur Microservices:
-User Service: CRUD pengguna, otentikasi (JWT/OAuth2).
-Transaction Service: Mengelola transaksi dengan validasi otomatis.
-Notification Service: Pengiriman email/SMS melalui RabbitMQ.
-Analytics Service: Menganalisis data transaksi pengguna menggunakan Kafka.
+Caching Data Transaksi Sementara
+Gunakan Redis untuk menyimpan histori transaksi yang sering diakses.
+
+Konfigurasi RabbitMQ untuk Notifikasi
+Kirim notifikasi transaksi menggunakan queue RabbitMQ.
+Contoh format message:
+{
+  "transactionId": "UUID",
+  "userId": "UUID",
+  "email": "string@example.com",
+  "status": "SUCCESS",
+  "amount": 100000
+}
+
+Analisis Transaksi dengan Kafka
+Streaming data transaksi ke Kafka untuk analitik.
+Set up topic Kafka transactions-analytics.
+
+Gunakan prinsip SOLID dan repository pattern untuk memisahkan logika bisnis dari kode database.
+Sertakan komentar untuk setiap service method yang dibuat, contohnya:
+/**
+ * This method handles user registration and saves the user to the database.
+ * @param userRequest contains user data such as username, password, and email.
+ * @return UserResponse containing userId and success message.
+ */
+public UserResponse registerUser(UserRequest userRequest) { ... }
+
+List endpoint terdapat di file docs.yaml
 
 Dokumen Desain: Diagram arsitektur, ERD, dan deskripsi teknis layanan.
 Kode Sumber: Repositori GitHub dengan struktur modular, dokumentasi, dan clean code.
