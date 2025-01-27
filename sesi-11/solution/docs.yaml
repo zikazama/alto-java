@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  title: EWallet API
+  description: API documentation for EWallet application
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+paths:
+  /api/auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: User registered successfully
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/auth/login:
+    post:
+      summary: Log in an existing user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: JWT token
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: Invalid credentials
+          content:
+            text/plain:
+              schema:
+                type: string
+
+  /api/wallet/topup:
+    post:
+      summary: Top up user balance
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: amount
+          in: query
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Top-up successful
+          content:
+            text/plain:
+              schema:
+                type: string
+        '404':
+          description: User not found
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        password:
+          type: string
+        balance:
+          type: number
+
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+        sender:
+          type: string
+        receiver:
+          type: string
+        amount:
+          type: number
+        timestamp:
+          type: string
+          format: date-time
