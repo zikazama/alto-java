@@ -1,0 +1,165 @@
+openapi: 3.0.0
+info:
+  title: Fintech App API
+  description: API untuk mengelola transaksi finansial, termasuk penggunaan Redis caching, CQRS, dan event sourcing.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Server lokal untuk pengembangan
+
+paths:
+  /api/transactions:
+    get:
+      summary: Ambil semua transaksi
+      description: Mendapatkan daftar semua transaksi dari sistem.
+      responses:
+        '200':
+          description: Daftar transaksi berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Transaction'
+
+    post:
+      summary: Buat transaksi baru
+      description: Membuat transaksi baru berdasarkan data yang diberikan.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionRequest'
+      responses:
+        '201':
+          description: Transaksi berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Data input tidak valid
+
+  /api/transactions/{id}:
+    get:
+      summary: Ambil detail transaksi
+      description: Mendapatkan detail transaksi berdasarkan ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID transaksi
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Detail transaksi berhasil diambil
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Transaksi tidak ditemukan
+
+  /api/events:
+    post:
+      summary: Buat event transaksi
+      description: Membuat event untuk mencatat perubahan status transaksi.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTransactionEventRequest'
+      responses:
+        '201':
+          description: Event transaksi berhasil dibuat
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionEvent'
+        '400':
+          description: Data input tidak valid
+
+components:
+  schemas:
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID transaksi
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL]
+          description: Jenis transaksi
+        amount:
+          type: number
+          format: double
+          description: Jumlah transaksi
+        accountNumber:
+          type: string
+          description: Nomor akun terkait transaksi
+        createdAt:
+          type: string
+          format: date-time
+          description: Waktu transaksi dibuat
+      required:
+        - type
+        - amount
+        - accountNumber
+
+    CreateTransactionRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [DEPOSIT, WITHDRAWAL]
+          description: Jenis transaksi
+        amount:
+          type: number
+          format: double
+          description: Jumlah transaksi
+        accountNumber:
+          type: string
+          description: Nomor akun terkait transaksi
+      required:
+        - type
+        - amount
+        - accountNumber
+
+    TransactionEvent:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID event transaksi
+        transactionId:
+          type: integer
+          description: ID transaksi terkait
+        eventType:
+          type: string
+          enum: [CREATED, COMPLETED, FAILED]
+          description: Jenis event transaksi
+        timestamp:
+          type: string
+          format: date-time
+          description: Waktu event dibuat
+      required:
+        - transactionId
+        - eventType
+
+    CreateTransactionEventRequest:
+      type: object
+      properties:
+        transactionId:
+          type: integer
+          description: ID transaksi terkait
+        eventType:
+          type: string
+          enum: [CREATED, COMPLETED, FAILED]
+          description: Jenis event transaksi
+      required:
+        - transactionId
+        - eventType
