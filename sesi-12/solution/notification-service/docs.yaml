@@ -1,0 +1,22 @@
+openapi: 3.0.0
+info:
+  title: Notification Service API
+  description: API Documentation for Notification Service.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8083
+    description: Notification Service
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      description: Checks if the Notification Service is running.
+      responses:
+        '200':
+          description: Notification Service is up and running.
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: Notification Service is up and running!
