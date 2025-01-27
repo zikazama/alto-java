@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: User Service API
+  description: API Documentation for User Service.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8081
+    description: User Service
+
+paths:
+  /api/v1/users/register:
+    post:
+      summary: Register a new user
+      description: Allows a user to register by providing username, password, and email.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: The username of the new user.
+                password:
+                  type: string
+                  description: The password of the new user.
+                email:
+                  type: string
+                  description: The email of the new user.
+      responses:
+        '200':
+          description: User successfully registered.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The user ID.
+                  username:
+                    type: string
+                  email:
+                    type: string
+
+  /api/v1/users/login:
+    post:
+      summary: Login a user
+      description: Authenticates a user and returns a JWT token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful, returns JWT token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: The JWT token.
+        '401':
+          description: Invalid credentials.

@@ -1,0 +1,62 @@
+openapi: 3.0.0
+info:
+  title: Transaction Service API
+  description: API Documentation for Transaction Service.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8082
+    description: Transaction Service
+
+paths:
+  /api/v1/transactions:
+    post:
+      summary: Create a transaction
+      description: Creates a new transaction such as top-up, transfer, or payment.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sender:
+                  type: string
+                  description: The username of the sender.
+                receiver:
+                  type: string
+                  description: The username of the receiver.
+                amount:
+                  type: number
+                  format: double
+                  description: The amount of the transaction.
+                type:
+                  type: string
+                  enum: [TOPUP, TRANSFER, PAYMENT]
+                  description: The type of the transaction.
+      responses:
+        '200':
+          description: Transaction created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: The transaction ID.
+                  sender:
+                    type: string
+                  receiver:
+                    type: string
+                  amount:
+                    type: number
+                    format: double
+                  type:
+                    type: string
+                    enum: [TOPUP, TRANSFER, PAYMENT]
+                  status:
+                    type: string
+                    enum: [SUCCESS, FAILED]
+                  createdAt:
+                    type: string
+                    format: date-time
