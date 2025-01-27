@@ -1,0 +1,249 @@
+openapi: 3.0.0
+info:
+  title: Fintech Transaction Service API
+  description: API untuk mengelola pengguna, transaksi, dan laporan transaksi pada layanan fintech.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+    description: Local server
+paths:
+  /users:
+    post:
+      summary: Buat akun pengguna
+      description: Membuat akun pengguna baru dengan nama lengkap, email, dan saldo awal (opsional).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  example: johndoe@example.com
+                initialBalance:
+                  type: number
+                  format: float
+                  example: 1000
+      responses:
+        200:
+          description: Pengguna berhasil dibuat.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  fullName:
+                    type: string
+                    example: John Doe
+                  email:
+                    type: string
+                    example: johndoe@example.com
+                  balance:
+                    type: number
+                    format: float
+                    example: 1000
+        400:
+          description: Email tidak valid atau sudah terdaftar.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Email is already registered."
+
+  /transactions/deposit:
+    post:
+      summary: Tambahkan saldo pengguna (Deposit)
+      description: Menambahkan saldo ke akun pengguna yang ada.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  example: 1
+                amount:
+                  type: number
+                  format: float
+                  example: 500
+      responses:
+        200:
+          description: Deposit berhasil.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 1
+                  newBalance:
+                    type: number
+                    format: float
+                    example: 1500
+        400:
+          description: Jumlah deposit tidak valid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Deposit amount must be positive."
+
+  /transactions/withdraw:
+    post:
+      summary: Tarik saldo pengguna (Withdraw)
+      description: Mengurangi saldo dari akun pengguna.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                userId:
+                  type: integer
+                  example: 1
+                amount:
+                  type: number
+                  format: float
+                  example: 200
+      responses:
+        200:
+          description: Withdraw berhasil.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  userId:
+                    type: integer
+                    example: 1
+                  newBalance:
+                    type: number
+                    format: float
+                    example: 1300
+        400:
+          description: Saldo tidak mencukupi atau jumlah tidak valid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Insufficient balance."
+
+  /transactions/transfer:
+    post:
+      summary: Transfer saldo antar pengguna
+      description: Memindahkan saldo dari satu pengguna ke pengguna lainnya.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fromUserId:
+                  type: integer
+                  example: 1
+                toUserId:
+                  type: integer
+                  example: 2
+                amount:
+                  type: number
+                  format: float
+                  example: 300
+      responses:
+        200:
+          description: Transfer berhasil.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fromUserId:
+                    type: integer
+                    example: 1
+                  toUserId:
+                    type: integer
+                    example: 2
+                  newBalanceFrom:
+                    type: number
+                    format: float
+                    example: 1000
+                  newBalanceTo:
+                    type: number
+                    format: float
+                    example: 800
+        400:
+          description: Saldo tidak mencukupi atau jumlah tidak valid.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Insufficient balance for transfer."
+
+  /transactions/{userId}:
+    get:
+      summary: Lihat riwayat transaksi pengguna
+      description: Mendapatkan daftar transaksi untuk pengguna berdasarkan ID pengguna.
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: integer
+          description: ID pengguna.
+      responses:
+        200:
+          description: Riwayat transaksi pengguna.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  transactions:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          type: string
+                          example: "DEPOSIT"
+                        amount:
+                          type: number
+                          format: float
+                          example: 1000
+                        date:
+                          type: string
+                          format: date-time
+                          example: "2025-01-01T12:00:00"
+        404:
+          description: Pengguna tidak ditemukan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "User not found."
