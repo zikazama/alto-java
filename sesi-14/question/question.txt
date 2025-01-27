@@ -1,58 +1,66 @@
-Perusahaan FinTech yang bergerak di bidang layanan transaksi keuangan memerlukan aplikasi untuk mengelola akun pelanggan, memproses transaksi keuangan secara real-time, serta menghasilkan laporan transaksi. Aplikasi harus dibangun dengan menggunakan Spring Boot (Maven) versi Java 21 dan mendukung pola komunikasi berbasis REST API untuk integrasi sistem antar layanan.
+Sebuah perusahaan FinTech yang bergerak di bidang layanan transaksi keuangan membutuhkan aplikasi untuk:
+Mengelola akun pelanggan.
+Memproses transaksi keuangan secara real-time.
+Menghasilkan laporan transaksi secara terjadwal atau berdasarkan permintaan.
 
-Aplikasi ini harus dapat menangani beberapa transaksi keuangan, seperti deposito, penarikan, dan transfer antar akun. Aplikasi juga harus mencatat seluruh transaksi, mengupdate saldo pelanggan secara otomatis, dan menghasilkan laporan berbasis periode tertentu.
+Aplikasi harus dibangun dengan Spring Boot (Maven) menggunakan Java 21 dan mendukung pola komunikasi berbasis REST API untuk integrasi antar layanan. Sistem harus mendukung beberapa jenis transaksi keuangan seperti deposito, penarikan, dan transfer antar akun. Aplikasi ini juga harus mencatat seluruh transaksi, mengupdate saldo pelanggan secara otomatis, serta menghasilkan laporan transaksi yang dapat difilter berdasarkan periode tertentu.
 
-Pengelolaan Data Pelanggan:
-Buat API untuk melakukan operasi CRUD pada data pelanggan, seperti:
-CREATE pelanggan baru (menambahkan akun baru).
-READ data pelanggan.
-UPDATE data pelanggan (misalnya mengganti alamat email).
-DELETE data pelanggan.
+Pengelolaan Data Pelanggan (User Service)
+Buat API untuk operasi CRUD pada data pelanggan dengan fitur berikut:
+CREATE pelanggan baru, dengan validasi email unik dan format yang benar.
+READ data pelanggan berdasarkan ID.
+UPDATE data pelanggan seperti mengganti alamat email.
+DELETE pelanggan berdasarkan ID.
 
-Proses Transaksi Keuangan:
-Implementasikan dua jenis transaksi: Deposit (menambah saldo) dan Penarikan (mengurangi saldo).
-Pastikan ada validasi saldo untuk transaksi penarikan agar saldo tidak negatif.
-Setiap transaksi harus disimpan dengan atribut idTransaksi, idPelanggan, jenisTransaksi (Deposit/Penarikan), nominal, dan tanggal.
+Proses Transaksi Keuangan (Transaction Service)
+Buat API untuk transaksi keuangan berikut:
+Deposit: Menambah saldo.
+Penarikan: Mengurangi saldo dengan validasi agar saldo tidak negatif.
+Setiap transaksi harus memiliki atribut berikut:
+idTransaksi, idPelanggan, jenisTransaksi (Deposit/Penarikan/Transfer), nominal, tanggal.
 
-Laporan Transaksi:
-Buat API untuk menghasilkan laporan transaksi berdasarkan periode waktu tertentu (misalnya, transaksi dalam satu bulan).
-Laporan harus menyertakan informasi total transaksi dan saldo akhir per pelanggan.
+Laporan Transaksi (Report Service)
+Buat API untuk menghasilkan laporan transaksi berdasarkan periode waktu tertentu, yang mencakup:
+Total transaksi pada periode tersebut.
+Saldo akhir per pelanggan pada periode yang ditentukan.
+Struktur dan Prinsip Clean Architecture
 
-Penggunaan Design Patterns:
-Gunakan Singleton Pattern untuk pengelolaan konfigurasi aplikasi yang bersifat global.
-Terapkan Factory Pattern untuk pembuatan objek transaksi yang berbeda (deposito vs penarikan).
+Bagi kode ke dalam beberapa layer utama berikut:
+Presentation Layer: Mengelola REST API.
+Application Layer: Menyediakan service untuk logika bisnis.
+Domain Layer: Mendefinisikan model dan entitas utama aplikasi.
+Infrastructure Layer: Berisi kode untuk mengelola database, pengelolaan konfigurasi global, dan implementasi koneksi antar layanan.
 
-Implementasi Clean Code:
-Buat kode yang terstruktur dengan baik dan mudah dipahami, dengan penamaan variabel dan metode yang jelas.
-Gunakan prinsip-prinsip Clean Code seperti menghindari duplikasi kode dan menulis kode yang mudah untuk diuji.
+Validasi Input
+Tetapkan validasi berikut:
+Email harus unik dan formatnya valid. Gunakan anotasi @Email dan @UniqueConstraint.
+Nominal transaksi harus angka positif. Gunakan anotasi @Min(1).
+Saldo pelanggan harus cukup untuk transaksi withdraw atau transfer. Implementasikan validasi ini di Service Layer.
 
-Database:
+Unit Testing (Minimal 3 Skenario)
+Buat pengujian unit dengan minimal 3 skenario:
+Berhasil menambahkan pelanggan baru.
+Gagal withdraw karena saldo tidak cukup.
+Gagal registrasi jika email sudah digunakan.
+
+Konsep Microservices
+Pisahkan sistem ke dalam tiga service:
+User Service: Mengelola data pelanggan (CRUD).
+Transaction Service: Memproses transaksi.
+Report Service: Mengelola laporan transaksi.
+Gunakan REST API atau gRPC untuk komunikasi antar layanan.
+
+Penggunaan Design Patterns
+Gunakan Singleton Pattern untuk pengelolaan konfigurasi aplikasi global.
+Gunakan Factory Pattern untuk pembuatan objek transaksi yang berbeda (deposito, penarikan, transfer).
+
+Database
 Gunakan PostgreSQL untuk menyimpan data pelanggan dan transaksi.
 Gunakan Spring Data JPA untuk menghubungkan Spring Boot dengan database PostgreSQL.
-Pastikan query dapat dioptimalkan, dengan memperhatikan normalisasi database untuk mengurangi redundansi data.
+Pastikan desain database telah dinormalisasi untuk mengurangi redundansi data dan mendukung kinerja optimal.
 
-Testing API dengan Postman:
-Sediakan contoh data untuk pelanggan dan transaksi.
-Gunakan Postman untuk menguji API yang telah Anda buat, termasuk pengujian untuk validasi transaksi (misalnya saldo yang tidak cukup untuk penarikan).
+Testing API dengan Postman
+Berikan contoh data pelanggan dan transaksi.
+Uji API untuk CRUD pelanggan, validasi saldo, dan laporan transaksi.
 
-Pengelolaan Akun Pelanggan (CRUD):
-Endpoint:
-POST /api/pelanggan: Menambahkan pelanggan baru.
-GET /api/pelanggan/{id}: Mengambil data pelanggan berdasarkan id.
-PUT /api/pelanggan/{id}: Memperbarui data pelanggan berdasarkan id.
-DELETE /api/pelanggan/{id}: Menghapus pelanggan berdasarkan id.
-
-Proses Transaksi:
-Endpoint:
-POST /api/transaksi/deposito: Memproses transaksi deposito (menambah saldo).
-POST /api/transaksi/penarikan: Memproses transaksi penarikan (mengurangi saldo, dengan validasi saldo).
-
-Laporan Transaksi:
-Endpoint:
-GET /api/laporan/transaksi: Mengambil laporan transaksi berdasarkan periode waktu.
-
-Sertakan file README dengan instruksi cara menjalankan aplikasi.
-Diagram Arsitektur Aplikasi (misalnya menggunakan UML).
-Instruksi Penggunaan API (termasuk contoh request dan response JSON).
-Kode Sumber (termasuk file pom.xml, file konfigurasi database, dan implementasi Java).
 

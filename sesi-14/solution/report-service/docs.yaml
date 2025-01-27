@@ -1,0 +1,46 @@
+openapi: 3.0.1
+info:
+  title: Report Service API
+  version: 1.0.0
+  description: API untuk menghasilkan laporan transaksi
+servers:
+  - url: http://localhost:8082
+    description: Development Server
+paths:
+  /api/laporan/transaksi:
+    get:
+      summary: Ambil laporan transaksi berdasarkan periode
+      parameters:
+        - name: startDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: 2025-01-01T00:00:00
+        - name: endDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: 2025-01-31T23:59:59
+      responses:
+        '200':
+          description: Laporan transaksi berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    idPelanggan:
+                      type: integer
+                      example: 1
+                    totalNominal:
+                      type: number
+                      example: 800000.0
+                    saldoAkhir:
+                      type: number
+                      example: 500000.0

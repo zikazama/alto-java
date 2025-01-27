@@ -1,0 +1,79 @@
+openapi: 3.0.1
+info:
+  title: Transaction Service API
+  version: 1.0.0
+  description: API untuk memproses transaksi keuangan
+servers:
+  - url: http://localhost:8081
+    description: Development Server
+paths:
+  /api/transaksi/deposit:
+    post:
+      summary: Proses transaksi deposit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idPelanggan:
+                  type: integer
+                  example: 1
+                nominal:
+                  type: number
+                  example: 500000.0
+      responses:
+        '200':
+          description: Transaksi deposit berhasil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 101
+                  idPelanggan:
+                    type: integer
+                    example: 1
+                  jenisTransaksi:
+                    type: string
+                    example: DEPOSIT
+                  nominal:
+                    type: number
+                    example: 500000.0
+                  tanggalTransaksi:
+                    type: string
+                    format: date-time
+                    example: 2025-01-27T08:00:00
+  /api/transaksi/withdraw:
+    post:
+      summary: Proses transaksi withdraw
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idPelanggan:
+                  type: integer
+                  example: 1
+                nominal:
+                  type: number
+                  example: 300000.0
+                saldoSaatIni:
+                  type: number
+                  example: 500000.0
+      responses:
+        '200':
+          description: Transaksi withdraw berhasil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+              

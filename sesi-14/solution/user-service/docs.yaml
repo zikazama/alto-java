@@ -1,0 +1,74 @@
+openapi: 3.0.1
+info:
+  title: User Service API
+  version: 1.0.0
+  description: API untuk mengelola data pelanggan
+servers:
+  - url: http://localhost:8080
+    description: Development Server
+paths:
+  /api/pelanggan:
+    post:
+      summary: Tambahkan pelanggan baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  example: john.doe@email.com
+      responses:
+        '200':
+          description: Pelanggan berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  nama:
+                    type: string
+                    example: John Doe
+                  email:
+                    type: string
+                    example: john.doe@email.com
+                  saldo:
+                    type: number
+                    example: 0.0
+    get:
+      summary: Ambil data pelanggan
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Data pelanggan berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  nama:
+                    type: string
+                    example: John Doe
+                  email:
+                    type: string
+                    example: john.doe@email.com
+                  saldo:
+                    type: number
+                    example: 100000.0
