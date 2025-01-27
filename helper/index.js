@@ -24,7 +24,7 @@ function getAllFiles(dirPath, filesList = []) {
 }
 
 // Define the root directory
-const rootDir = path.resolve('./../sesi-12/solution/financial-app/src/main'); // Change 'your-directory' to your target directory
+const rootDir = path.resolve('./../sesi-13/solution/src/main'); // Change 'your-directory' to your target directory
 
 try {
     // Fetch all file paths

@@ -1,276 +1,318 @@
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/FinancialAppApplication.java ===
-package com.financial.financial_app;
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/FintechTransactionServiceApplication.java ===
+package com.example.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class FinancialAppApplication {
+public class FintechTransactionServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FinancialAppApplication.class, args);
+		SpringApplication.run(FintechTransactionServiceApplication.class, args);
 	}
 
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/FinancialAppApplication.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/FintechTransactionServiceApplication.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/config/RabbitMQConfig.java ===
-package com.financial.config;
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/adapter/repository/TransactionRepository.java ===
+package com.example.demo.adapter.repository;
 
-import org.springframework.amqp.core.Queue;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.example.demo.domain.Transaction;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Configuration
-public class RabbitMQConfig {
-
-    @Bean
-    public Queue transactionQueue() {
-        return new Queue("transactionQueue", false);
-    }
+public interface TransactionRepository extends JpaRepository<Transaction, Long> {
+    // Tambahkan method custom jika diperlukan
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/config/RabbitMQConfig.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/adapter/repository/TransactionRepository.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/config/RedisConfig.java ===
-package com.financial.config;
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/adapter/repository/UserRepository.java ===
+package com.example.demo.adapter.repository;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import com.example.demo.domain.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
-@Configuration
-public class RedisConfig {
-
-    @Bean
-    public LettuceConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory("localhost", 6379);
-    }
-
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(redisConnectionFactory());
-        return template;
-    }
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByEmail(String email);
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/config/RedisConfig.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/adapter/repository/UserRepository.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/config/TransactionListener.java ===
-package com.financial.config;
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/controller/UserController.java ===
+import com.example.demo.adapter.repository.TransactionRepository;
+import com.example.demo.adapter.repository.UserRepository;
+import com.example.demo.domain.Transaction;
+import com.example.demo.domain.User;
 
-import org.springframework.kafka.annotation.KafkaListener;
-import org.springframework.stereotype.Component;
-
-@Component
-public class TransactionListener {
-
-    @KafkaListener(topics = "transactionTopic", groupId = "financial-app-group")
-    public void listen(String message) {
-        System.out.println("Received Kafka message: " + message);
-    }
-}
-
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/config/TransactionListener.java ===
-
-
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/controller/UserController.java ===
-package com.financial.controller;
-
-import com.financial.entity.User;
-import com.financial.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/users")
 public class UserController {
     private final UserService userService;
 
-    // Constructor manual
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        return ResponseEntity.ok(userService.registerUser(user));
-    }
-
-    @GetMapping("/{username}")
-    public ResponseEntity<User> getUser(@PathVariable String username) {
-        return ResponseEntity.ok(userService.getUserByUsername(username));
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestParam String fullName,
+                                           @RequestParam String email,
+                                           @RequestParam(required = false) BigDecimal initialBalance) {
+        User user = userService.createUser(fullName, email, initialBalance);
+        return ResponseEntity.ok(user);
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/controller/UserController.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/controller/UserController.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/dto/TransactionDTO.java ===
-package com.financial.dto;
-
-import lombok.Data;
-
-@Data
-public class TransactionDTO {
-    private String sender;
-    private String receiver;
-    private Double amount;
-    private String type;
-}
-
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/dto/TransactionDTO.java ===
-
-
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/entity/User.java ===
-package com.financial.entity;
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/domain/Transaction.java ===
+package com.example.demo.domain;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
-@Data
+@Table(name = "transactions")
+public class Transaction {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Column(nullable = false)
+    private String type; // "DEPOSIT", "WITHDRAW", "TRANSFER"
+
+    @Column(nullable = false)
+    private BigDecimal amount;
+
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
+
+    public Transaction() {}
+
+    public Transaction(Long id, User user, String type, BigDecimal amount, LocalDateTime timestamp) {
+        this.id = id;
+        this.user = user;
+        this.type = type;
+        this.amount = amount;
+        this.timestamp = timestamp;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+}
+
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/domain/Transaction.java ===
+
+
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/domain/User.java ===
+package com.example.demo.domain;
+
+import jakarta.persistence.*;
+import java.math.BigDecimal;
+
+@Entity
+@Table(name = "users")
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String email;
 
     @Column(nullable = false)
-    private String password;
+    private String fullName;
 
-    @Column(nullable = false, unique = true)
-    private String email;
-}
+    @Column(nullable = false)
+    private BigDecimal balance;
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/entity/User.java ===
+    public User() {
+        this.balance = BigDecimal.ZERO;
+    }
 
+    public User(Long id, String email, String fullName, BigDecimal balance) {
+        this.id = id;
+        this.email = email;
+        this.fullName = fullName;
+        this.balance = balance;
+    }
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/exception/GlobalExceptionHandler.java ===
-package com.financial.exception;
+    public Long getId() {
+        return id;
+    }
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-@RestControllerAdvice
-public class GlobalExceptionHandler {
+    public String getEmail() {
+        return email;
+    }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public BigDecimal getBalance() {
+        return balance;
+    }
+
+    public void setBalance(BigDecimal balance) {
+        this.balance = balance;
     }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/exception/GlobalExceptionHandler.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/domain/User.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/repository/UserRepository.java ===
-package com.financial.repository;
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/usecase/TransactionService.java ===
+import com.example.demo.adapter.repository.TransactionRepository;
+import com.example.demo.adapter.repository.UserRepository;
+import com.example.demo.domain.Transaction;
+import com.example.demo.domain.User;
+import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
-import com.financial.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-    User findByUsername(String username);
+@Service
+public class TransactionService {
+    private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+
+    public TransactionService(TransactionRepository transactionRepository, UserRepository userRepository) {
+        this.transactionRepository = transactionRepository;
+        this.userRepository = userRepository;
+    }
+
+    @Transactional
+    public Transaction deposit(Long userId, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Deposit amount must be positive.");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        user.setBalance(user.getBalance().add(amount));
+        Transaction transaction = new Transaction(null, user, "DEPOSIT", amount, LocalDateTime.now());
+
+        return transactionRepository.save(transaction);
+    }
 }
 
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/repository/UserRepository.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/usecase/TransactionService.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/service/UserService.java ===
-package com.financial.service;
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/usecase/UserService.java ===
+import com.example.demo.adapter.repository.TransactionRepository;
+import com.example.demo.adapter.repository.UserRepository;
+import com.example.demo.domain.Transaction;
+import com.example.demo.domain.User;
 
-import com.financial.entity.User;
-import com.financial.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 @Service
 public class UserService {
+
     private final UserRepository userRepository;
 
-    // Constructor manual
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User registerUser(User user) {
+    @Transactional
+    public User createUser(String email, String fullName, BigDecimal initialBalance) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email is already registered.");
+        }
+        User user = new User(null, email, fullName, initialBalance == null ? BigDecimal.ZERO : initialBalance);
         return userRepository.save(user);
     }
 
-    public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("User not found."));
     }
 }
-
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/service/UserService.java ===
-
-
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/util/JwtUtil.java ===
-package com.financial.util;
-
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.stereotype.Component;
-
-import java.util.Date;
-
-@Component
-public class JwtUtil {
-    private static final String SECRET_KEY = "secretKeyExample";
-
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 3600000))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
-                .compact();
-    }
-}
-
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/java/com/financial/financial_app/util/JwtUtil.java ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/java/com/example/demo/usecase/UserService.java ===
 
 
-=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/resources/application.properties ===
-spring.application.name=FinancialApp
+=== Start of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/resources/application.properties ===
+spring.application.name=FintechTransactionService
 
-# SERVER CONFIG
-server.port=8080
-
-# DATABASE CONFIG
-spring.datasource.url=jdbc:mysql://localhost:3306/financial_db
+spring.datasource.url=jdbc:mysql://localhost:3306/fintech_db?useSSL=false&serverTimezone=UTC
 spring.datasource.username=root
-spring.datasource.password=yourpassword
+spring.datasource.password=Password
+
 spring.jpa.hibernate.ddl-auto=update
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 
-# REDIS CONFIG
-spring.redis.host=localhost
-spring.redis.port=6379
-
-# RABBITMQ CONFIG
-spring.rabbitmq.host=localhost
-spring.rabbitmq.port=5672
-spring.rabbitmq.username=guest
-spring.rabbitmq.password=guest
-
-# KAFKA CONFIG
-spring.kafka.bootstrap-servers=localhost:9092
-
-# JWT CONFIG
-jwt.secret=secretKeyExample
-jwt.expiration-ms=3600000
-
-=== End of /Users/memberid/Documents/Alto/alto-java/sesi-12/solution/financial-app/src/main/resources/application.properties ===
+=== End of /Users/memberid/Documents/Alto/alto-java/sesi-13/solution/src/main/resources/application.properties ===

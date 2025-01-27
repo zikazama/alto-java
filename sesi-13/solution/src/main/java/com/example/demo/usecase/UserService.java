@@ -1,8 +1,7 @@
-import com.example.demo.adapter.repository.TransactionRepository;
-import com.example.demo.adapter.repository.UserRepository;
-import com.example.demo.domain.Transaction;
-import com.example.demo.domain.User;
+package com.example.demo.usecase;
 
+import com.example.demo.adapter.repository.UserRepository;
+import com.example.demo.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +18,9 @@ public class UserService {
 
     @Transactional
     public User createUser(String email, String fullName, BigDecimal initialBalance) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new IllegalArgumentException("Invalid email format.");
+        }
         if (userRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("Email is already registered.");
         }
